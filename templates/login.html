@@ -1,10 +1,83 @@
 <!doctype html>
-<title>Hello from Flask</title>
+<title>CompuStore</title>
 {% if errors %}
   <h3>{{ errors }}!</h3>
 {% endif %}
-<form action="" method="post">
-            <p> Username: <input type=text name=username>
-            <p> Password: <input type=password name=password>
-            <p><input type=submit value=Login>
- </form>
+
+<link class="cssdeck" rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-responsive.min.css') }}" class="cssdeck">
+
+<div class="" id="loginModal">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3>Have an Account?</h3>
+	</div>
+	<div class="modal-body">
+		<div class="well">
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#login" data-toggle="tab">Login</a></li>
+				<li><a href="#create" data-toggle="tab">Create Account</a></li>
+			</ul>
+			<div id="myTabContent" class="tab-content">
+				<div class="tab-pane active in" id="login">
+					<form class="form-horizontal" action='' method="POST">
+						<fieldset>
+							<div id="legend">
+								<legend class="">Login</legend>
+							</div>    
+							<div class="control-group">
+								<!-- Username -->
+								<label class="control-label"  for="username">Username</label>
+								<div class="controls">
+									<input type="text" id="username" name=username placeholder="" class="input-xlarge">
+								</div>
+							</div>
+							
+							<div class="control-group">
+								<!-- Password-->
+								<label class="control-label" for="password">Password</label>
+								<div class="controls">
+									<input type="password" id="password" name=password placeholder="" class="input-xlarge">
+								</div>
+							</div>
+							
+							
+							<div class="control-group">
+								<!-- Button -->
+								<div class="controls">
+									<button class="btn btn-success">Login</button>
+								</div>
+							</div>
+						</fieldset>
+					</form>                
+				</div>
+				<div class="tab-pane fade" id="create">
+					<form id="tab" method = 'POST' action = '/signup'>
+						<label>Name</label>
+						<input type="text" value="" class="input-xlarge">
+						<label>Phone Number</label>
+						<input type="text" value="" class="input-xlarge">
+						<label>Email</label>
+						<input type="text" value="" class="input-xlarge">
+						<label>Address</label>
+						<textarea value="Smith" rows="3" class="input-xlarge">
+						</textarea>
+						<label>Credit Card Number</label>
+						<input type="text" value="" class="input-xlarge">
+						<label>Bank</label>
+						<input type="text" value="" class="input-xlarge">
+						<label>Expiration Date</label>
+						<input type="date" value="" class="input-xlarge">
+						<label>Security Code</label>
+						<input type="text" value="" class="input-xlarge">
+						<div>
+							<button class="btn btn-primary">Create Account</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<script class="cssdeck" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script class="cssdeck" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>

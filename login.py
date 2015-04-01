@@ -24,12 +24,25 @@ def login():
 
     return render_template("login.html", errors=errors)
 
+
 @app.route("/logout")
 def logout():
     if 'username' in session:
         session.pop('username', None)
     return redirect(url_for('login'))
 
+@app.route("/signup",methods=["POST"])
+def signup():
+    errors = None
+    # save user to database and sign them in
+
+@app.route("/home")
+def home():
+    return render_template("home.html")
+
+@app.route("/item/<identifier>")
+def item(identifier = None):
+    return render_template("item.html",identifier = identifier)
 
 def check_user(username, password):
     return username==password
