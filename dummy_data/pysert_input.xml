@@ -1,0 +1,10 @@
+<pysert iterations="20">
+<dataset name="custid" type="Sequence" start="1" increment="1"/>
+<dataset name="fname" type="PersonalName" firstname="True" lastname="False"/>
+<dataset name="lname" type="PersonalName" firstname="False" lastname="True"/>
+<dataset name="phone" type="NumberSequence" length="9"/>
+<dataset name="salary" type="Date" max_year="2020" min_year="2015"/>
+<template>
+INSERT INTO EMPLOYEES(EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, JOB_ID, SALARY) VALUES (#{custid}, '#{fname}', '#{lname}', '#{fname}_#{lname}@domain.com', #{phone},#{salary});
+</template>
+ </pysert>
