@@ -1,4 +1,5 @@
 __author__ = 'RiteshReddy'
+import __setup_path
 from functools import wraps
 
 from flask import Flask, request, session, redirect, url_for
