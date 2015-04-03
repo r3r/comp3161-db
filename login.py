@@ -6,18 +6,21 @@ from flask_base import *
 
 laptops = [  # fake array of laptops
         {
+            'id': 1,
             'name': 'Dell Inspiron',
             'price': 45,
             'description': 'Description of dell inspiron'
         },
         {
+            'id': 2,
             'name': 'Hp note',
-            'price':60,
+            'price': 60,
             'description': 'Decription of hp note'
         },
         {
+            'id': 3,
             'name': 'Apple Macintosh',
-            'price':600,
+            'price': 600,
             'description': 'Decription of mac'
         }
     ]
@@ -70,10 +73,23 @@ def home():
 
 
 @app.route("/item/<identifier>")
+@authenticate
 def item(identifier=None):
-    return render_template("item.html", identifier=identifier)
+    laptop = None
+
+    if identifier:
+        laptop = get_laptop(identifier)  #get laptop based on id
+
+    return render_template("item.html", identifier=identifier, laptop=laptop)
 
 
 def check_user(username, password):
     return username == password
+
+
+def get_laptop(identifier):
+    for laptop in laptops:
+        if int(identifier) == laptop.get('id'):
+            return laptop
+    return None
 

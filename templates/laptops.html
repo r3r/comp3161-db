@@ -4,8 +4,8 @@
             <img src="http://placehold.it/320x150" alt="">
             <div class="caption">
         {% if laptop %}
-          <h4 class="pull-right">{{ laptop.price }}</h4>
-          <h4><a href="#">{{ laptop.name }}</a> </h4>
+          <h4 class="pull-right">${{ laptop.price }}</h4>
+          <h4><a href="{{ url_for( 'item',identifier=laptop.id )}}">{{ laptop.name }}</a> </h4>
           <p>{{ laptop.description }}</p>
         {% else %}
           <h4 class="pull-right">$0</h4>
