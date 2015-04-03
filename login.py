@@ -3,11 +3,36 @@ import __setup_path
 from db import *
 from flask_base import *
 
+
+laptops = [  # fake array of laptops
+        {
+            'name': 'Dell Inspiron',
+            'price': 45,
+            'description': 'Description of dell inspiron'
+        },
+        {
+            'name': 'Hp note',
+            'price':60,
+            'description': 'Decription of hp note'
+        },
+        {
+            'name': 'Apple Macintosh',
+            'price':600,
+            'description': 'Decription of mac'
+        }
+    ]
+
+branch1 = {
+            'name': 'Branch 1'
+        }
+
+
 @app.route('/', endpoint="index")
 @app.route('/<name>')
 @authenticate
 def hello_world(name=None):
     return render_template('hello.html', name=name)
+
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -31,19 +56,24 @@ def logout():
         session.pop('username', None)
     return redirect(url_for('login'))
 
-@app.route("/signup",methods=["POST"])
+
+@app.route("/signup", methods=["POST"])
 def signup():
     errors = None
     # save user to database and sign them in
 
-@app.route("/home")
+
+@app.route("/branch1")
+@authenticate
 def home():
-    return render_template("home.html")
+    return render_template("branch1.html", branch=branch1, laptops=laptops)
+
 
 @app.route("/item/<identifier>")
-def item(identifier = None):
-    return render_template("item.html",identifier = identifier)
+def item(identifier=None):
+    return render_template("item.html", identifier=identifier)
+
 
 def check_user(username, password):
-    return username==password
+    return username == password
 
