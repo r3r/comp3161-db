@@ -105,4 +105,4 @@ docs/_build/
 # PyBuilder
 target/
 
-
+dummy_data/
