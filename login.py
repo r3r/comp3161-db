@@ -45,7 +45,9 @@ def signup():
 
 
 def check_user(username, password):
-    return username == password
+    in_db_passwd = get_user_password(where_user_is=username)
+    return password == in_db_passwd
+
 
 
 
