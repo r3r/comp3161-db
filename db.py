@@ -20,8 +20,9 @@ def get_engine(to, echo=False):
     return engine
 
 
-def get_customers(engine=get_engine("online"), where="1"):
-    return engine.execute('select * from customers WHERE ' + where).fetchall()
+def get_customers(offset, maxResults=30, where="1", engine=get_engine("online")):
+    return engine.execute(text('select * from customer WHERE :where LIMIT :offset, :maxResults'),
+                          {"where": where, "offset": offset, "maxResults": maxResults}).fetchall()
 
 
 def make_branch_purchase(engine, laptops):
@@ -158,6 +159,13 @@ def get_all_online_orders(engine=get_engine("online")):
     return result
 
 
+def get_customer_order(custid, engine=get_engine("online")):
+    order_ids = engine.execute(text("SELECT `orderid` from `online_purchases` WHERE `custid`=:custid"),
+                               {"custid": custid}).fetchall()
+    orders = map(lambda x: get_online_order(x[0]), order_ids)
+    return {"custid": custid, "orders": orders}
+
+
 def register_user(first_name, last_name, address, phone, email, passwd, ccnumber, security_code, expiry_date,
                   engine=get_engine("online")):
     """
@@ -199,6 +207,20 @@ def register_user(first_name, last_name, address, phone, email, passwd, ccnumber
         return None, e.message
 
 
+def add_inventory(engine, qty, vendor, model, price, ram, hdd, screensize):
+    insert_inventory = text("INSERT INTO `inventory` VALUES (:qty, :vendor, :model, :price, :ram, :hdd, :screensize)")
+    connection = engine.connect()
+    transaction = connection.begin()
+    try:
+        connection.execute(insert_inventory,
+                           {"qty": qty, "vendor": vendor, "model": model, "price": price, "ram": ram, "hdd": hdd,
+                            "screensize": screensize})
+        transaction.commit()
+        return True, None
+    except Exception, e:
+        transaction.rollback()
+        return False, e.message
+
 def get_user_password(engine=get_engine("online"), where_user_is="1"):
     string = text("SELECT `passwd` FROM `customer` WHERE `custid` = :id")
     res = engine.execute(string, {"id": where_user_is}).first()
@@ -208,6 +230,9 @@ def get_user_password(engine=get_engine("online"), where_user_is="1"):
         return None
 
 
+def test_get_customers():
+    print "********test_get_customers********"
+    print get_customers(1)
 
 def test_make_branch_purchase():
     print "********test_make_branch_purchase********"
@@ -223,7 +248,7 @@ def test_make_online_purchase():
 
 def test_register_user():
     print "********test_register_user********"
-    print register_user("Ritesh", "Reddy", "Mona UWI", "2283822", "r@r.com", "jah", "1234567890123456", "132",
+    print register_user("Ritesh", "Reddy", "Mona UWI", "2283822", "r@r.com", "jah", "1234567890122456", "132",
                         "2017-03-03")
 
 
@@ -261,10 +286,21 @@ def test_get_customer():
     print "********test_get_customer********"
     print get_customer(2)
 
+
+def test_get_customer_order():
+    print "********test_get_customer_order********"
+    print get_customer_order(1)
+
+
+def test_add_inventory():
+    print "********test_add_inventory********"
+    print add_inventory(get_engine("branch1"), 100, "Ritesh", "Starship Enterprise!", 302320, 32, 4096, 14.4)
+
 if __name__ == "__main__":
+    test_get_customers()
     test_make_branch_purchase()
     test_make_online_purchase()
-    test_register_user()
+    # test_register_user()
     test_get_all_online_orders()
     test_get_online_order()
     test_get_all_branch_orders()
@@ -272,3 +308,5 @@ if __name__ == "__main__":
     test_get_laptop()
     test_get_laptops()
     test_get_customer()
+    test_get_customer_order()
+    #test_add_inventory()
