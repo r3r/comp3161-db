@@ -1,15 +1,25 @@
+{% extends "base.html" %}
+{%block title %}CompuStore Laptop{%endblock %}
+{%block body %}
+{%if errors %}
+<div class="alert alert-danger" role="alert"> {{errors}}</div>
+{%else%}
 <div class="thumbnail">
-    <img src="http://placehold.it/320x150" alt="">
+    <img src="{{ url_for('static', filename='generic_laptop.jpg') }}">
     <div class="caption-full">
-        {% if laptop %}
-          <h4 class="pull-right">${{ laptop.price }}</h4>
-          <h4><a href="#">{{ laptop.name }}</a> </h4>
-          <p>{{ laptop.description }}</p>
-        {% else %}
-          <h4 class="pull-right">$0</h4>
-          <h4><a href="#">laptop doesnt have a name</a> </h4>
-          <p>No description</p>
-        {% endif %}
+
+        <h4 class="pull-right">Price: ${{ laptop.price }}</h4>
+        <h4>Name: <a href="/laptop/{{branch}}/{{laptop.vendor}}/{{laptop.model}}">{{laptop.vendor }} {{ laptop.model
+            }}</a></h4>
+        <h4>RAM : {{laptop.ram}}GB</h4>
+        <h4>HDD: {{laptop.hdd}}GB</h4>
+        <h4>Screensize: {{laptop.screensize}}"</h4>
+        <h4>Quantity Available: {{laptop.quantity}} pieces</h4>
+
+        <p>{{ laptop.description }}</p>
+
 
     </div>
 </div>
+{%endif%}
+{%endblock%}

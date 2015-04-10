@@ -3,12 +3,29 @@ import __setup_path
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.sql import text
 import datetime, uuid
-
+from functools import wraps
+from flask import abort
 
 urls = {"branch1": "mysql://root:root@localhost/compustore_branch1",
         "branch2": "mysql://root:root@localhost/compustore_branch2",
         "branch3": "mysql://root:root@localhost/compustore_branch3",
         "online": "mysql://root:root@localhost/compustore_online"}
+
+branch_titles = {"branch1": "Kingston Branch",
+                 "branch2": "Ocho Rios Branch",
+                 "branch3": "Montego Bay Branch",
+                 "online": "Online Store"}
+
+
+def validate_branch(f):
+    @wraps(f)
+    def wrapper(branch, *args, **kwargs):
+        if not branch in branch_titles:
+            abort(404)
+        else:
+            return f(branch, *args, **kwargs)
+
+    return wrapper
 
 
 def get_engine(to, echo=False):
@@ -42,11 +59,12 @@ def make_branch_purchase(engine, laptops):
             id = int(id) + 1
         insert_purchase = text("INSERT INTO `store_purchases` (`orderid`, `purchase_date`) VALUES(:id, :date)")
         connection.execute(insert_purchase, {"id": str(id), "date": datetime.date.today().isoformat()})
-        for laptop, qty in laptops.items():
+        for laptop, (qty, cost) in laptops.items():
             insert_line_item = text(
-                "INSERT INTO `line_item` (`vendor`, `model`, `orderid`, `quantity`) VALUES (:vendor, :model, :orderid, :quantity)")
+                "INSERT INTO `line_item` (`vendor`, `model`, `orderid`, `quantity`, `line_total`) VALUES (:vendor, :model, :orderid, :quantity, :line_total)")
             connection.execute(insert_line_item,
-                               {'vendor': laptop[0], 'model': laptop[1], 'orderid': id, 'quantity': qty})
+                               {'vendor': laptop[0], 'model': laptop[1], 'orderid': id, 'quantity': qty,
+                                "line_total": int(qty) * float(cost)})
             connection.execute(text(
                 "UPDATE `inventory` SET `quantity` = `quantity` - :quantity WHERE `vendor`=:vendor and `model`=:model"),
                                {'quantity': qty, "vendor": laptop[0], "model": laptop[1]})
@@ -62,7 +80,7 @@ def make_online_purchase(customer_id, laptops):
 
     :param engine: Connection engine
     :param customer_id: customer purchasing this item
-    :param laptops: dictionary of laptops -> qty + branch => {(vendor, model):(qty, branch)}
+    :param laptops: dictionary of laptops -> qty + branch => {(vendor, model):(qty, branch, cost)}
     :return: order_id, tracking_id
     """
     connections = {}
@@ -81,14 +99,15 @@ def make_online_purchase(customer_id, laptops):
             "INSERT INTO `online_purchases` (`orderid`, `purchase_date`, `trackingno`, `custid`) VALUES(:id, :date, :trackingno, :custid)")
         connections['online'].execute(insert_purchase, {"id": str(id), "date": datetime.date.today().isoformat(),
                                                         "trackingno": trackingno, "custid": customer_id})
-        for laptop, details in laptops.items():
+        for (vendor, model), (qty, branch, cost) in laptops.items():
             insert_line_item = text(
-                "INSERT INTO `line_item` (`vendor`, `model`, `orderid`, `quantity`, `branch_id`) VALUES (:vendor, :model, :orderid, :quantity, :branch_id)")
-            connections['online'].execute(insert_line_item, {'vendor': laptop[0], 'model': laptop[1], 'orderid': id,
-                                                             'quantity': details[0], "branch_id": details[1]})
-            connections[details[1]].execute(text(
+                "INSERT INTO `line_item` (`vendor`, `model`, `orderid`, `quantity`, `branch_id`, `line_total`) VALUES (:vendor, :model, :orderid, :quantity, :branch_id, :line_total)")
+            connections['online'].execute(insert_line_item, {'vendor': vendor, 'model': model, 'orderid': id,
+                                                             'quantity': qty, "branch_id": branch,
+                                                             "line_total": int(qty) * float(cost)})
+            connections[branch].execute(text(
                 "UPDATE `inventory` SET `quantity` = `quantity` - :quantity WHERE `vendor`=:vendor and `model`=:model"),
-                                            {'quantity': details[0], "vendor": laptop[0], "model": laptop[1]})
+                                        {'quantity': qty, "vendor": vendor, "model": model})
         for transaction in transactions.values():
             transaction.commit()
         return id, trackingno
@@ -221,6 +240,24 @@ def add_inventory(engine, qty, vendor, model, price, ram, hdd, screensize):
         transaction.rollback()
         return False, e.message
 
+
+def get_customer_purchase_report_date(start_date, end_date, engine=get_engine("online")):
+    return engine.execute(text("CALL getCustomerTotalsDate(:start_date, :end_date);"),
+                          {"start_date": start_date, "end_date": end_date}).fetchall()
+
+
+def get_customer_purchase_report_amount(amount, engine=get_engine("online")):
+    return engine.execute(text("CALL getCustomerTotalsThreshold(:amount);"), {"amount": amount}).fetchall()
+
+
+def get_laptops_by_top_sales(engine):
+    return engine.execute(text("CALL getLaptopsByTopSale()")).fetchall()
+
+
+def get_num_sales_branch(engine, start_date, end_date, ):
+    return engine.execute(text("SELECT getNumberOfSales(:start_date, :end_date);"),
+                          {"start_date": start_date, "end_date": end_date}).first()[0]
+
 def get_user_password(engine=get_engine("online"), where_user_is="1"):
     string = text("SELECT `passwd` FROM `customer` WHERE `custid` = :id")
     res = engine.execute(string, {"id": where_user_is}).first()
@@ -237,13 +274,13 @@ def test_get_customers():
 def test_make_branch_purchase():
     print "********test_make_branch_purchase********"
     engine = get_engine("branch1")
-    print make_branch_purchase(engine, {('Acer', '00CA'): 2, ('Acer', '00H'): 1})
+    print make_branch_purchase(engine, {('Acer', '00CA'): (2, 250), ('Acer', '00H'): (1, 32.20)})
 
 
 def test_make_online_purchase():
     print "********test_make_online_purchase********"
-    print make_online_purchase("1", {('Acer', '00CA'): (2, 'branch1'), ('Acer', '00H'): (1, 'branch1'),
-                                     ('Acer', '0071'): (1, 'branch2')})
+    print make_online_purchase("1", {('Acer', '00CA'): (2, 'branch1', 123.123), ('Acer', '00H'): (1, 'branch1', 433.23),
+                                     ('Acer', '0071'): (1, 'branch2', 123.1223)})
 
 
 def test_register_user():
@@ -296,6 +333,25 @@ def test_add_inventory():
     print "********test_add_inventory********"
     print add_inventory(get_engine("branch1"), 100, "Ritesh", "Starship Enterprise!", 302320, 32, 4096, 14.4)
 
+
+def test_get_customer_purchase_report_date():
+    print "********test_get_customer_purchase_report_date********"
+    print get_customer_purchase_report_date("2015-04-05", "2015-04-09")
+
+
+def test_get_laptops_by_top_sales():
+    print "********test_get_laptops_by_top_sales********"
+    print get_laptops_by_top_sales(get_engine("branch1"))
+    print get_laptops_by_top_sales(get_engine("branch2"))
+    print get_laptops_by_top_sales(get_engine("branch3"))
+
+
+def test_get_num_sales_branch():
+    print "********test_get_num_sales_branch********"
+    print get_num_sales_branch(get_engine("branch1"))
+    print get_num_sales_branch(get_engine("branch2"))
+    print get_num_sales_branch(get_engine("branch3"))
+
 if __name__ == "__main__":
     test_get_customers()
     test_make_branch_purchase()
@@ -310,3 +366,6 @@ if __name__ == "__main__":
     test_get_customer()
     test_get_customer_order()
     #test_add_inventory()
+    test_get_customer_purchase_report_date()
+    test_get_laptops_by_top_sales()
+    test_get_num_sales_branch()

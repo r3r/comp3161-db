@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{%block title %}Top Laptops By Sale : {{branch}}{%endblock %}
+{%block body %}
+<table class="table table-striped table-hover ">
+    <tr>
+        <th>Vendor</th>
+        <th>Model</th>
+        <th>#Sales</th>
+    </tr>
+
+    {% for laptop in laptops %}
+    <tr>
+        <td>{{laptop.vendor}}</td>
+        <td>{{laptop.model}}</td>
+        <td>{{laptop.num_sales}}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+{%endblock%}

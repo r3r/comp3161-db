@@ -194,8 +194,8 @@ class Sequence(AbstractDataSet):
         }
     '''
     def __init__(self, ds_dict):
-        ''' 
-        We will need to @override the constructor in order to add 
+        '''
+        We will need to @override the constructor in order to add
         the _cval property (current value in sequence) .
         '''
         super(Sequence, self).__init__(ds_dict)
@@ -221,6 +221,7 @@ class NumberSequence(AbstractDataSet):
             "length" : "<integer value>",
         }
     '''
+    seen = set()
     def validation_list(self):
         return ['name', 'length']
 
@@ -229,7 +230,8 @@ class NumberSequence(AbstractDataSet):
             return ''
         p = [str(random.randint(1,9))]
         p.extend(str(random.randint(0,9)) for i in xrange(int(self.length)-1))
-        return ''.join(p)
+        p = ''.join(p)
+        return p
 #------------------------------------------------------------------------------
 class Date(AbstractDataSet):
     '''
@@ -271,8 +273,8 @@ class Address(AbstractDataSet):
 
     def next_value(self):
         add = str(random.randint(1,500)) + " "
-        add += self.line[random.randint(1,1000) % len(self.line)] + " "
-        add += self.town[random.randint(1,1000) % len(self.town)] + " "
+        add += self.line[random.randint(1, 1000) % len(self.line)] + ", "
+        add += self.town[random.randint(1, 1000) % len(self.town)] + ", "
         add += ''.join(str(random.randint(1,9)) for i in range(5))
         return add
 #------------------------------------------------------------------------------
@@ -291,6 +293,65 @@ class LaptopVendor(AbstractDataSet):
     def next_value(self):
         return self.vendors[random.randint(0,1000) % len(self.vendors)]
 #------------------------------------------------------------------------------
+class VendorModel(AbstractDataSet):
+    '''
+     ds_dict will contain the following:
+        {
+            "name" : <string value>
+            "iterations" : "<integer value>",
+        }
+    '''
+
+    def __init__(self, ds_dict):
+        '''
+        We will need to @override the constructor in order to add
+        the _cval property (current value in sequence) .
+        '''
+        super(VendorModel, self).__init__(ds_dict)
+        self.vendor = ['Acer', 'HP', 'Dell', 'Apple', 'ASUS', 'Alienware', 'Sony', 'Lenovo', 'IBM', 'Microsoft']
+        self.model = AlphaNumeric(
+            {"name": "model", "min_length": "3", "max_length": "7", "alphabet": "True", "numeric": "True"})
+        self.seen = set()
+        self.start = 0
+        self.index = 0
+        self.iterations = int(self.iterations)
+        self.margin = (self.iterations / len(self.vendor))
+
+
+    def validation_list(self):
+        return ["name", "iterations"]
+
+    def next_value(self):
+        ven = self.vendor[(self.start / self.margin) % len(self.vendor)]
+        self.start += 1
+        mod = self.model.next_value()
+        while mod in self.seen:
+            mod = self.model.next_value()
+        self.seen.add(mod)
+        return ven + "','" + mod
+
+
+# ------------------------------------------------------------------------------
+
+class PowersOf2(AbstractDataSet):
+    '''
+     ds_dict will contain the following:
+        {
+            "name" : <string value>
+            "log_min": <int value>,
+            "log_max": <int value>
+        }
+    '''
+
+    def validation_list(self):
+        return ["name", "log_min", "log_max"]
+
+    def next_value(self):
+        i = random.randint(int(self.log_min), int(self.log_max))
+        return 1 << i
+
+
+#------------------------------------------------------------------------------
 class ScreenSize(AbstractDataSet):
     '''
      ds_dict will contain the following:
@@ -298,12 +359,40 @@ class ScreenSize(AbstractDataSet):
             "name" : <string value>
         }
     '''
-    screens = ['9"', '10"', '11.1"', '12.1"', '13.3"', '14.1"', '15.6"', '16.4"', '17.1"', '18.1"']
+    screens = ['9', '10', '11.1', '12.1', '13.3', '14.1', '15.6', '16.4', '17.1', '18.1']
     def validation_list(self):
         return ['name']
 
     def next_value(self):
         return self.screens[random.randint(0,1000) % len(self.screens)]
+
+
+# ------------------------------------------------------------------------------
+class AlphaNumeric(AbstractDataSet):
+    '''
+     ds_dict will contain the following:
+        {
+            "name" : <string value>
+            "min_length" : <long value>
+            "max_length" : <long value>
+            "alphabet" : <boolean value>
+            "numeric" : <boolean value>
+        }
+    '''
+    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    numer = "0123456789"
+
+    def validation_list(self):
+        return ["name", "min_length", "max_length", "alphabet", "numeric"]
+
+    def next_value(self):
+        lst = ""
+        if self.alphabet == "True":
+            lst += self.alpha
+        if self.numeric == "True":
+            lst += self.numer
+        return ''.join(lst[random.randint(0, 1000) % len(lst)] for i in
+                       xrange(random.randint(int(self.min_length), int(self.max_length))))
 
 #------------------------------------------------------------------------------
 class DataSetBuilder(object):
@@ -419,13 +508,15 @@ class DataSetEvaluator(object):
             return str(self.instances_values[key])
 
         for i in range(self.iterations):
-            output.write(re.sub(regex, inner_subst, self.template) + '\n')
+            if ( i % 10000 == 0):
+                print i
+            output.write(re.sub(regex, inner_subst, self.template))
             self.instances_values = self.update_iterations_values()
         
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    ap = argparse.ArgumentParser(description='Generate test data.')
+    ap = argparse.ArgumentParser(description='  Generate test data.')
     ap.add_argument('-i','--input', dest='ifile', help='the input file (XML)')
     ap.add_argument('-o','--output', dest='ofile',
                      help='the output file (TEXT)')

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Compustore</title>
+
+
+    {% block head %}
+
+    {% endblock %}
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap.min-home.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='shop-homepage.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-responsive.min.css') }}" class="cssdeck">
+
+    <style>
+        select, textarea, input[type="text"], input[type="password"], input[type="datetime"],
+        input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"],
+        input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"],
+        input[type="color"], .uneditable-input { height:40px;}
+        input {height:auto; !important}
+    </style>
+
+
+</head>
+
+<body> <!-- Navigation -->
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+
+        <a class="navbar-brand" href="/">Compustore - RJCN</a>
+
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+
+        <ul class="nav navbar-nav navbar-right">
+            {% if session.username %}
+            <li><a href="/logout">Logout </a></li>
+            {% else %}
+            <li><a href="/login">Login </a></li>
+            {% endif %}
+            <li><a href="#">Browse Online Store</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reports
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="/reports/branches" style="font-weight:bold;">Branches by Top Sales</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" style="font-weight:bold;"> Laptops by Top Sales</a></li>
+                    <li><a href="/reports/branch1/topsales">Kingston Branch</a></li>
+                    <li><a href="/reports/branch2/topsales">Ocho Rios Branch</a></li>
+                    <li><a href="/reports/branch3/topsales">Montego Bay Branch</a></li>
+                    <li class="divider"></li>
+                    <li><a href="/reports/customers" style="font-weight:bold;">Customers by Top Sales</a></li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+</nav>
+
+<!-- Page Content -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h1>{% block title %} Compustore{% endblock %} </h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+
+        <div class="col-md-12">
+
+
+            {% block body %}
+
+            {% endblock %}
+        </div>
+    </div>
+</div>
+<div class="container">
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="row">
+            <div class="col-lg-12">
+                <p>Copyright &copy; Compustore 2014</p>
+            </div>
+        </div>
+    </footer>
+
+</div>
+<!-- /.container -->
+
+<script class="cssdeck" src="{{ url_for('static', filename='jquery.js') }}"></script>
+<script class="cssdeck" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+</body>
+</html>

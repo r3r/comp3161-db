@@ -1,1 +1,7 @@
-You just purchased {{ name }}
+{% extends "base.html" %}
+{%block title %}CompuStore Receipt{%endblock %}
+
+{%block body %}
+<h3> Thank you for purchasing</h3>
+<div class="alert alert-success" role="alert">Tracking No: {{trackingno}}</div>
+{%endblock%}

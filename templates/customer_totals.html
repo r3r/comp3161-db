@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{%block title %}Customer Purchase Totals{%endblock %}
+{%block body %}
+{% if customers %}
+<table class="table table-striped table-hover ">
+    <tr>
+        <th>Customer ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Total Purchases</th>
+    </tr>
+
+    {% for customer in customers %}
+    <tr>
+        <td>{{customer.custid}}</td>
+        <td>{{customer.first_name}} {{customer.last_name}}</td>
+        <td>{{customer.phone}}</td>
+        <td>{{customer.email}}</td>
+        <td>{{customer.grand_total}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+{% if errors %}
+<div class="alert alert-danger" role="alert">{{ errors }}</div>
+{% endif %}
+<form class="form-horizontal" action='' method="POST">
+    <fieldset>
+        <div id="legend">
+            <legend class="">Generate Report using Date</legend>
+        </div>
+        <div class="control-group">
+            <!-- Username -->
+            <label class="control-label" for="start_date">Start Date</label>
+
+            <div class="controls">
+                <input type="date" id="start_date" name="start_date" placeholder="" class="input-xlarge">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <!-- Password-->
+            <label class="control-label" for="end_date">End Date</label>
+
+            <div class="controls">
+                <input type="date" id="end_date" name="end_date" placeholder="" class="input-xlarge">
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <!-- Button -->
+            <div class="controls">
+                <button class="btn btn-success">Get Report!</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+
+<hr>
+<form class="form-horizontal" action='' method="POST">
+    <fieldset>
+        <div id="legend">
+            <legend class="">Generate report over $ threshold</legend>
+        </div>
+        <div class="control-group">
+            <!-- Username -->
+            <label class="control-label" for="amount">Start Date</label>
+
+            <div class="controls">
+                <input type="number" id="amount" name="amount" step="any" placeholder="" class="input-xlarge">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <!-- Button -->
+            <div class="controls">
+                <button class="btn btn-success">Get Report!</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+
+
+{% endif %}
+{% endblock %}

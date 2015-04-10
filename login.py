@@ -40,6 +40,15 @@ def logout():
 @app.route("/signup", methods=["POST"])
 def signup():
     errors = None
+    form = request.form
+    id, name = register_user(form['fName'], form['lName'], form['address'], form['phone'], form['email'],
+                             form['passwd'], form['ccnumber'], form['securitycode'], form['expirydate'])
+    if id is None:
+        errors = name
+        form = {k: str(v) for k, v in form.items()}
+        return render_template('signup.html', errors=errors, **form)
+    else:
+        return render_template('signup.html', errors=None, id=id, name=name)
     # save user to database and sign them in
 
 

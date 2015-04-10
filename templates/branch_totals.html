@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{%block title %}Branch Sales Totals{%endblock %}
+{%block body %}
+{% if largest %}
+<table class="table table-striped table-hover ">
+    <tr>
+        <th>Branch Name</th>
+        <th>Total Sales</th>
+    </tr>
+    <tr {% if largest==
+    "branch1" %} class="success" {%endif%} >
+    <td>Kingston Branch</td>
+    <td>{{branch1}}</td>
+    </tr>
+    <tr {% if largest==
+    "branch2" %} class="success" {%endif%}>
+    <td>Ocho Rios Branch</td>
+    <td>{{branch2}}</td>
+    </tr>
+    <tr {% if largest==
+    "branch3" %} class="success" {%endif%}>
+    <td>Montego Bay Branch</td>
+    <td>{{branch3}}</td>
+    </tr>
+</table>
+{% else %}
+<form class="form-horizontal" action='' method="POST">
+    <fieldset>
+        <div id="legend">
+            <legend class="">Generate Report using Date</legend>
+        </div>
+        <div class="control-group">
+            <!-- Username -->
+            <label class="control-label" for="start_date">Start Date</label>
+
+            <div class="controls">
+                <input type="date" id="start_date" name="start_date" placeholder="" class="input-xlarge">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <!-- Password-->
+            <label class="control-label" for="end_date">End Date</label>
+
+            <div class="controls">
+                <input type="date" id="end_date" name="end_date" placeholder="" class="input-xlarge">
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <!-- Button -->
+            <div class="controls">
+                <button class="btn btn-success">Get Report!</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+{%endif%}
+{%endblock%}

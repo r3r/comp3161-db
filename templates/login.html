@@ -1,5 +1,7 @@
-<!doctype html>
-<title>CompuStore</title>
+{% extends "base.html" %}
+{%block title %}CompuStore Login{%endblock %}
+{%block body %}
+
 {% if errors %}
   <h3>{{ errors }}!</h3>
 {% endif %}
@@ -8,11 +10,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-responsive.min.css') }}" class="cssdeck">
 
 <div class="" id="loginModal">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-		<h3>Have an Account?</h3>
-	</div>
-	<div class="modal-body">
+    <div class="modal-body" style="max-height:1024px;">
 		<div class="well">
 			<ul class="nav nav-tabs">
 				<li class="active"><a href="#login" data-toggle="tab">Login</a></li>
@@ -53,23 +51,28 @@
 				</div>
 				<div class="tab-pane fade" id="create">
 					<form id="tab" method = 'POST' action = '/signup'>
-						<label>Name</label>
-						<input type="text" value="" class="input-xlarge">
+                        <div id="legend">
+                            <legend class="">Create Account</legend>
+                        </div>
+                        <label>First Name</label>
+                        <input type="text" name="fName" value="" class="input-xlarge"> <br/>
+                        <label>Last Name</label>
+                        <input type="text" name="lName" value="" class="input-xlarge"> <br/>
+                        <label>Password</label>
+                        <input type="password" name="passwd" value="" class="input-xlarge"> <br/>
 						<label>Phone Number</label>
-						<input type="text" value="" class="input-xlarge">
+                        <input type="text" name="phone" value="" class="input-xlarge"> <br/>
 						<label>Email</label>
-						<input type="text" value="" class="input-xlarge">
+                        <input type="text" name="email" value="" class="input-xlarge"> <br/>
 						<label>Address</label>
-						<textarea value="Smith" rows="3" class="input-xlarge">
-						</textarea>
+						<textarea value="Smith" name="address" rows="3" class="input-xlarge">
+						</textarea> <br/>
 						<label>Credit Card Number</label>
-						<input type="text" value="" class="input-xlarge">
-						<label>Bank</label>
-						<input type="text" value="" class="input-xlarge">
+                        <input type="text" value="" name="ccnumber" class="input-xlarge"> <br/>
 						<label>Expiration Date</label>
-						<input type="date" value="" class="input-xlarge">
+                        <input type="date" value="" name="expirydate" class="input-xlarge"> <br/>
 						<label>Security Code</label>
-						<input type="text" value="" class="input-xlarge">
+                        <input type="text" value="" name="securitycode" class="input-xlarge"> <br/> <br/>
 						<div>
 							<button class="btn btn-primary">Create Account</button>
 						</div>
@@ -78,6 +81,4 @@
 			</div>
 		</div>
 	</div>
-
-<script class="cssdeck" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script class="cssdeck" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    {%endblock%}
