@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{%block title %}Compustore Online Catalgoue{%endblock %}
+{%block body %}
+<form class="form-horizontal" method="POST" action="/buy">
+    <table class="table table-striped table-hover ">
+        <tr>
+            <th>Number</th>
+            <th>Vendor</th>
+            <th>Model</th>
+            <th>Screensize</th>
+            <th>RAM</th>
+            <th>HDD</th>
+            <th>Price</th>
+            <th>Quantity</th>
+
+        </tr>
+
+        {% for laptop in laptops %}
+        <tr>
+            <td><a href="/laptop/{{laptop.branch}}/{{laptop.vendor}}/{{laptop.model}}"> {{loop.index}}</a></td>
+            <td>{{laptop.vendor}}</td>
+            <td>{{laptop.model}}</td>
+            <td>{{laptop.screensize}}"</td>
+            <td>{{laptop.ram}}GB</td>
+            <td>{{laptop.hdd}}GB</td>
+            <td>${{laptop.price}}</td>
+            <td><input style="height:27px;" type="number" min="0" max="{{laptop.maxquantity}}"
+                       name="{{laptop.vendor}}-{{laptop.model}}-qty" value="0"/></td>
+            <input type="hidden" name="{{laptop.vendor}}-{{laptop.model}}-branch" value="{{laptop.branch}}"/>
+            <input type="hidden" name="{{laptop.vendor}}-{{laptop.model}}-cost" value="{{laptop.price}}"/>
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="control-group">
+        <!-- Button -->
+        <div class="controls pull-right">
+            <button class="btn btn-success">Buy!</button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

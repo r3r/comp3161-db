@@ -3,7 +3,7 @@
 {%block body %}
 
 {% if errors %}
-  <h3>{{ errors }}!</h3>
+<div class="alert alert-danger" role="alert">{{ errors }}</div>
 {% endif %}
 
 <link class="cssdeck" rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">

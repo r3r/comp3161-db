@@ -49,3 +49,16 @@ CREATE TABLE line_item (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE INDEX purchase_date ON online_purchases (purchase_date);
+
+
+use compustore_bank;
+
+CREATE TABLE creditcards
+  (
+     ccnumber     VARCHAR(16) NOT NULL,
+     address      VARCHAR (255) NOT NULL,
+     securitycode VARCHAR (20) NOT NULL,
+     expirydate   DATE NOT NULL,
+     PRIMARY KEY (ccnumber)
+  )
+engine=innodb DEFAULT CHARSET=utf8;

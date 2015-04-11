@@ -117,7 +117,7 @@ def make_online_purchase(customer_id, laptops):
         return None, e
 
 
-def get_laptops(engine, offset, maxResults=30):
+def get_laptops(engine, offset=0, maxResults=50):
     connection = engine.connect()
     return connection.execute(text("SELECT * FROM `inventory` LIMIT :offset, :maxResults"),
                               {"offset": offset, "maxResults": maxResults}).fetchall()
@@ -130,7 +130,7 @@ def get_laptop(engine, vendor, model):
 
 def get_customer(custid, engine=get_engine("online")):
     string = text(
-        "SELECT * FROM `customer` as cust  join `creditcards` as cc on cust.custid=cc.custid WHERE cust.`custid` = :id")
+        "SELECT cust.*, cc.ccnumber, cc.address as ccaddress, cc.expirydate, cc.securitycode FROM `customer` as cust  join `creditcards` as cc on cust.custid=cc.custid WHERE cust.`custid` = :id")
     return engine.execute(string, {"id": custid}).first()
 
 
@@ -258,6 +258,17 @@ def get_num_sales_branch(engine, start_date, end_date, ):
     return engine.execute(text("SELECT getNumberOfSales(:start_date, :end_date);"),
                           {"start_date": start_date, "end_date": end_date}).first()[0]
 
+
+def check_creditcard_details(ccnumber, address, securitycode, expirydate):
+    engine = create_engine("mysql://root:root@localhost/compustore_bank", echo=False)
+    card = engine.execute(text("SELECT * FROM creditcards WHERE ccnumber=:ccnumber"), {"ccnumber": ccnumber}).first()
+    if card is None:
+        return False
+    return str(ccnumber) == str(card.ccnumber) and str(address) == str(card.address) and str(securitycode) == str(
+        card.securitycode) and str(expirydate) == str(card.expirydate)
+
+
+
 def get_user_password(engine=get_engine("online"), where_user_is="1"):
     string = text("SELECT `passwd` FROM `customer` WHERE `custid` = :id")
     res = engine.execute(string, {"id": where_user_is}).first()
@@ -274,13 +285,14 @@ def test_get_customers():
 def test_make_branch_purchase():
     print "********test_make_branch_purchase********"
     engine = get_engine("branch1")
-    print make_branch_purchase(engine, {('Acer', '00CA'): (2, 250), ('Acer', '00H'): (1, 32.20)})
+    print make_branch_purchase(engine, {('Alienware', 'EPY'): (2, 250), ('Alienware', 'GKWV46K'): (1, 32.20)})
 
 
 def test_make_online_purchase():
     print "********test_make_online_purchase********"
-    print make_online_purchase("1", {('Acer', '00CA'): (2, 'branch1', 123.123), ('Acer', '00H'): (1, 'branch1', 433.23),
-                                     ('Acer', '0071'): (1, 'branch2', 123.1223)})
+    print make_online_purchase("1",
+                               {('Acer', 'E23Q'): (2, 'branch1', 123.123), ('Acer', 'EBJG2'): (1, 'branch1', 433.23),
+                                ('Acer', 'G6Q241'): (1, 'branch2', 123.1223)})
 
 
 def test_register_user():
@@ -348,9 +360,16 @@ def test_get_laptops_by_top_sales():
 
 def test_get_num_sales_branch():
     print "********test_get_num_sales_branch********"
-    print get_num_sales_branch(get_engine("branch1"))
-    print get_num_sales_branch(get_engine("branch2"))
-    print get_num_sales_branch(get_engine("branch3"))
+    print get_num_sales_branch(get_engine("branch1"), "2015-04-03", datetime.date.today().isoformat())
+    print get_num_sales_branch(get_engine("branch2"), "2015-04-03", datetime.date.today().isoformat())
+    print get_num_sales_branch(get_engine("branch3"), "2015-04-03", datetime.date.today().isoformat())
+
+
+def test_check_creditcard_details():
+    print "********test_check_creditcard_details********"
+    print check_creditcard_details(4040000001, "452 Mona Road, Montego Bay, 87142", 600, "2017-03-11")
+    print check_creditcard_details(4040000000000001, "452 Mona Road, Montego Bay, 87142", 600, "2017-03-11")
+    print check_creditcard_details(4040000000000002, "126 Spanish Town Road, Kingston, 26763", 212, "2019-07-19")
 
 if __name__ == "__main__":
     test_get_customers()
@@ -369,3 +388,4 @@ if __name__ == "__main__":
     test_get_customer_purchase_report_date()
     test_get_laptops_by_top_sales()
     test_get_num_sales_branch()
+    test_check_creditcard_details()

@@ -7,13 +7,6 @@ from flask_base import *
 
 
 
-@app.route('/', endpoint="index")
-@app.route('/<name>')
-@authenticate
-def hello_world(name=None):
-    return render_template('hello.html', name=name)
-
-
 @app.route('/login', methods=["GET", "POST"])
 def login():
     errors = None

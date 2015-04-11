@@ -2,6 +2,44 @@
 {%block title %}CompuStore Receipt{%endblock %}
 
 {%block body %}
-<h3> Thank you for purchasing</h3>
-<div class="alert alert-success" role="alert">Tracking No: {{trackingno}}</div>
+{% if errors %}
+<div class="alert alert-danger" role="alert">{{ errors }}</div>
+{% else %}
+<table class="table table-striped table-hover ">
+    <tr>
+        <th>Number</th>
+        <th>Vendor</th>
+        <th>Model</th>
+        <th>Quantity</th>
+        <th>Cost</th>
+
+    </tr>
+    {% for laptop in laptops %}
+    <tr>
+        <td>{{loop.index}}</td>
+        <td>{{laptop[0]}}</td>
+        <td>{{laptop[1]}}</td>
+        <td>{{laptop[2]}}</td>
+        <td>${{laptop[4]}}</td>
+    </tr>
+    {%endfor%}
+</table>
+<hr/>
+
+<div class="row">
+    <div class="col-md-7"></div>
+    <div class="col-md-5">
+        <table class="table table-striped table-hover pull-right">
+            <tr>
+                <th>Total</th>
+                <th>Tracking No</th>
+            </tr>
+            <tr>
+                <td>${{total}}</td>
+                <td>{{trackingno}}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% endif %}
 {%endblock%}

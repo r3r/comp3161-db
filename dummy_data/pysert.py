@@ -379,7 +379,7 @@ class AlphaNumeric(AbstractDataSet):
             "numeric" : <boolean value>
         }
     '''
-    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     numer = "0123456789"
 
     def validation_list(self):
