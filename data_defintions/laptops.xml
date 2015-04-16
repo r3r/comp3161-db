@@ -1,0 +1,21 @@
+<pysert iterations="50">
+    <dataset name="quantity1" type="RandomNumber" floating="False" min="100" max="350"/>
+    <dataset name="quantity2" type="RandomNumber" floating="False" min="100" max="350"/>
+    <dataset name="quantity3" type="RandomNumber" floating="False" min="100" max="350"/>
+    <dataset name="vendormodel" type="VendorModel" iterations="50"/>
+    <dataset name="price" type="RandomNumber" floating="True" min="100000" max="350000"/>
+    <dataset name="ram" type="PowersOf2" log_min="1" log_max="5"/>
+    <dataset name="hdd" type="PowersOf2" log_min="5" log_max="11"/>
+    <dataset name="screensize" type="ScreenSize"/>
+    <template>
+        use compustore_branch1;
+        INSERT INTO inventory (quantity, vendor, model, price, ram, hdd, screensize) VALUES ('#{quantity1}',
+        '#{vendormodel}', '#{price}', '#{ram}', '#{hdd}', '#{screensize}');
+        use compustore_branch2;
+        INSERT INTO inventory (quantity, vendor, model, price, ram, hdd, screensize) VALUES ('#{quantity2}',
+        '#{vendormodel}', '#{price}', '#{ram}', '#{hdd}', '#{screensize}');
+        use compustore_branch3;
+        INSERT INTO inventory (quantity, vendor, model, price, ram, hdd, screensize) VALUES ('#{quantity3}',
+        '#{vendormodel}', '#{price}', '#{ram}', '#{hdd}', '#{screensize}');
+    </template>
+</pysert>

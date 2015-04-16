@@ -1,0 +1,19 @@
+<pysert iterations="500000">
+    <dataset name="custid" type="Sequence" start="1" increment="1"/>
+    <dataset name="first_name" type="PersonalName" firstname="True" lastname="False"/>
+    <dataset name="last_name" type="PersonalName" firstname="False" lastname="True"/>
+    <dataset name="address" type="Address"/>
+    <dataset name="phone" type="NumberSequence" length="7"/>
+    <dataset name="passwd" type="AlphaNumeric" min_length="5" max_length="8" alphabet="True" numeric="True"/>
+
+    <dataset name="number" type="Sequence" start="4040000000000001" increment="1"/>
+    <dataset name="securitycode" type="NumberSequence" length="3"/>
+    <dataset name="expirydate" type="Date" min_year="2015" max_year="2020"/>
+    <template>
+        INSERT INTO customer(`custid`,`first_name`,`last_name`, `address`, `phone`, `email`, `passwd`) VALUES
+        ('#{custid}', '#{first_name}', '#{last_name}', '#{address}', '#{phone}', '#{first_name}.#{last_name}@mail.com',
+        '#{passwd}');
+        INSERT INTO creditcards(`ccnumber`, `address`, `securitycode`, `expirydate`, `custid`) VALUES ('#{number}',
+        '#{address}', '#{securitycode}', '#{expirydate}', '#{custid}');
+    </template>
+</pysert>
